@@ -1,0 +1,101 @@
+<html>
+    <head>
+        <title>Login Form</title>
+        <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+        <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+        <script src="https://code.jquery.com/jquery-3.7.1.slim.js"></script>
+
+        <script type="module">
+
+            const firebaseConfig = {
+                apiKey: "AIzaSyDinUuH74i2bf09UpDV8K8IFfjzWVRzUYM",
+                authDomain: "ilodrive.firebaseapp.com",
+                projectId: "ilodrive",
+                storageBucket: "ilodrive.appspot.com",
+                messagingSenderId: "705714786474",
+                appId: "1:705714786474:web:2d108f6f544dfb59d700d3",
+                measurementId: "G-8W13CJDXEV"
+            };
+
+            firebase.initializeApp(firebaseConfig);
+            const db = firebase.database();
+
+            var x = parseInt(Math.random() * 100);
+
+            $("#addData").click(function(){
+
+                var fnameData = $("#bfname").val();
+                var lnameData = $("#blname").val();
+                var addressData = $("#baddress").val();
+                var genderData = $("#bgender").val();
+                var statusData = $("#bstatus").val();
+                var passwordData = $("#bpassword").val();
+
+                db.ref("accounts/rider"+fnameData+x).set({
+                    Firstname: fnameData,
+                    Lastname: lnameData,
+                    gender: genderData,
+                    address: addressData,
+                    status: statusData,
+                    password: passwordData
+            })
+            .then(() => {
+                alert("Account Created, kindly take note of you your username: rider"+fnameData+x);
+            })
+            .catch((error) => {
+                alert("Error writing data: ", error);
+            })
+        });
+
+        const riderRef = db.ref("accounts");
+
+        $("#login").click(function(){
+            var uname = $("#uname").val();
+            var pw = $("#pw").val();
+
+            riderRef.once("value")
+            .then((snapshot) => {
+                const data = snapshot.val();
+                $.each(data, function(i, val){
+                    if(i == uname){
+                        if(val.password == pw){
+                            alert("Login Successful");
+                            $("welcome").text("Welcome Back "+ val.Firstname);
+                        }
+                        else{
+                            alert("Login details not match");
+                        }
+                    }
+            });
+        })
+        .catch((error) => {
+            console.error("Error reading data: ", error);
+        });
+    });
+
+        </script>
+    </head>
+    
+    <body>
+        <h1>Registration Form</h1>
+        <div>
+            <input type="text" name="name" id="bfname" value="" placeholder="First name">
+            <input type="text" name="name" id="blname" value="" placeholder="Last name"><br>
+            <input type="text" name="name" id="bgender" value="" placeholder="Gender">
+            <input type="text" name="name" id="baddress" value="" placeholder="Address"><br>
+            <input type="text" name="name" id="bstatus" value="" placeholder="Status">
+            <input type="text" name="name" id="bpassword" value="" placeholder="Password">
+            <button id="addData">Create Account</button>
+        </div>
+        <br>
+        <hr>
+        <h1>Login Form</h1>
+        <h2 id="Welcome"></h2>
+        <input type="text" name="" id="uname" placeholder="Your Username">
+        <input type="password" name="" id="pw" placeholder="Your Password">
+        <button id="login">Login</button>
+    </body>
+
+</html>
